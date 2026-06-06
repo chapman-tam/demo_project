@@ -13,15 +13,16 @@ import {
 import {
   calculateNextHighScore,
   createHoleIds,
-  isValidWhack,
-  pickNextHole,
+  generateMathProblem,
+  pickMultipleHoles,
+  MathProblem,
 } from "../lib/game-engine";
 import { loadHighScore, saveHighScore } from "../lib/high-score";
 import { GameSoundEffects } from "../lib/sound-effects";
 
 type ActiveMole = {
   holeId: number;
-  spawnId: number;
+  value: number;
 };
 
 const HOLE_IDS = createHoleIds();
@@ -31,13 +32,13 @@ export default function Home() {
   const [score, setScore] = useState(0);
   const [bestScore, setBestScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION_SECONDS);
-  const [activeMole, setActiveMole] = useState<ActiveMole | null>(null);
+  const [activeMoles, setActiveMoles] = useState<ActiveMole[]>([]);
+  const [currentProblem, setCurrentProblem] = useState<MathProblem | null>(null);
   const [lastHitHole, setLastHitHole] = useState<number | null>(null);
   const [isShaking, setIsShaking] = useState(false);
 
   const timerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const spawnIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const previousHoleRef = useRef<number | null>(null);
   const spawnCounterRef = useRef(0);
   const scoreRef = useRef(0);
   const hitSpawnIdsRef = useRef(new Set<number>());
@@ -60,10 +61,10 @@ export default function Home() {
   const stopGame = useCallback(() => {
     clearLoops();
     setStatus("ended");
-    setActiveMole(null);
+    setActiveMoles([]);
+    setCurrentProblem(null);
 
     const soundEffects = ensureSoundEffects();
-    // No need to unlock here, it should already be active, but playing end sound
     soundEffects.playEnd();
 
     const nextBest = calculateNextHighScore(bestScore, scoreRef.current);
@@ -74,23 +75,25 @@ export default function Home() {
   }, [bestScore, clearLoops, ensureSoundEffects]);
 
   const spawnMole = useCallback(() => {
-    const nextHole = pickNextHole(HOLE_IDS, previousHoleRef.current);
-    previousHoleRef.current = nextHole;
-    spawnCounterRef.current += 1;
+    const problem = generateMathProblem();
+    const holes = pickMultipleHoles(HOLE_IDS, 3);
+    
+    const newActiveMoles = holes.map((holeId, index) => ({
+      holeId,
+      value: problem.options[index],
+    }));
 
+    spawnCounterRef.current += 1;
     const soundEffects = ensureSoundEffects();
     soundEffects.playPop();
 
-    setActiveMole({
-      holeId: nextHole,
-      spawnId: spawnCounterRef.current,
-    });
+    setCurrentProblem(problem);
+    setActiveMoles(newActiveMoles);
   }, [ensureSoundEffects]);
 
   const startGameLoop = useCallback(async () => {
     clearLoops();
     
-    // CRITICAL: Unlock audio directly in the click-triggered loop
     const soundEffects = ensureSoundEffects();
     const unlocked = await soundEffects.unlock();
     
@@ -103,7 +106,6 @@ export default function Home() {
     scoreRef.current = 0;
     setTimeLeft(GAME_DURATION_SECONDS);
     setLastHitHole(null);
-    previousHoleRef.current = null;
     spawnCounterRef.current = 0;
     hitSpawnIdsRef.current.clear();
 
@@ -125,7 +127,7 @@ export default function Home() {
       });
     }, 1000);
 
-    spawnIntervalRef.current = setInterval(spawnMole, SPAWN_INTERVAL_MS);
+    spawnIntervalRef.current = setInterval(spawnMole, SPAWN_INTERVAL_MS * 4.0); // Show moles longer for math solving
   }, [clearLoops, ensureSoundEffects, spawnMole, stopGame]);
 
   const handleStart = () => {
@@ -140,19 +142,23 @@ export default function Home() {
 
   const handleWhack = useCallback(
     (holeId: number) => {
-      if (status !== "running" || activeMole === null) return;
+      if (status !== "running" || activeMoles.length === 0 || !currentProblem) return;
+
+      const mole = activeMoles.find(m => m.holeId === holeId);
+      if (!mole) return;
 
       const soundEffects = ensureSoundEffects();
 
-      if (!isValidWhack(activeMole.holeId, holeId)) {
+      if (mole.value !== currentProblem.answer) {
         soundEffects.playMiss();
+        // Option: deduct score or just miss
         return;
       }
 
-      if (hitSpawnIdsRef.current.has(activeMole.spawnId)) return;
+      if (hitSpawnIdsRef.current.has(spawnCounterRef.current)) return;
 
-      hitSpawnIdsRef.current.add(activeMole.spawnId);
-      setActiveMole(null);
+      hitSpawnIdsRef.current.add(spawnCounterRef.current);
+      setActiveMoles([]);
       setLastHitHole(holeId);
       setIsShaking(true);
       
@@ -169,7 +175,7 @@ export default function Home() {
         setIsShaking(false);
       }, 300);
     },
-    [activeMole, ensureSoundEffects, status],
+    [activeMoles, currentProblem, ensureSoundEffects, status],
   );
 
   useEffect(() => {
@@ -208,11 +214,16 @@ export default function Home() {
            <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-violet-600/10 blur-[100px]" />
         </section>
 
-        <GameHud score={score} bestScore={bestScore} timeLeft={timeLeft} />
+        <GameHud 
+          score={score} 
+          bestScore={bestScore} 
+          timeLeft={timeLeft} 
+          question={currentProblem?.question}
+        />
 
         <MoleGrid
           holeIds={HOLE_IDS}
-          activeHole={activeMole?.holeId ?? null}
+          activeMoles={activeMoles}
           lastHitHole={lastHitHole}
           canWhack={status === "running"}
           onWhack={handleWhack}

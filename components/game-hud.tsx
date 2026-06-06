@@ -2,17 +2,19 @@ type GameHudProps = {
   score: number;
   bestScore: number;
   timeLeft: number;
+  question?: string;
 };
 
-export function GameHud({ score, bestScore, timeLeft }: GameHudProps) {
+export function GameHud({ score, bestScore, timeLeft, question }: GameHudProps) {
   const statCards = [
-    { label: "Score", value: score, tone: "from-violet-500/80 to-indigo-500/80" },
-    { label: "Best", value: bestScore, tone: "from-cyan-500/80 to-sky-500/80" },
-    { label: "Time", value: `${timeLeft}s`, tone: "from-amber-500/80 to-orange-500/80" },
+    { label: "Question", value: question ?? "---", tone: "from-fuchsia-400 to-violet-400" },
+    { label: "Score", value: score, tone: "from-emerald-400 to-teal-400" },
+    { label: "Best", value: bestScore, tone: "from-cyan-400 to-sky-400" },
+    { label: "Time", value: `${timeLeft}s`, tone: "from-amber-400 to-orange-400" },
   ];
 
   return (
-    <section className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
+    <section className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
       {statCards.map((card) => (
         <article
           key={card.label}

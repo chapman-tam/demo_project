@@ -1,6 +1,6 @@
 type MoleGridProps = {
   holeIds: number[];
-  activeHole: number | null;
+  activeMoles: { holeId: number; value: number }[];
   lastHitHole: number | null;
   canWhack: boolean;
   onWhack: (holeId: number) => void;
@@ -8,7 +8,7 @@ type MoleGridProps = {
 
 export function MoleGrid({
   holeIds,
-  activeHole,
+  activeMoles,
   lastHitHole,
   canWhack,
   onWhack,
@@ -16,7 +16,8 @@ export function MoleGrid({
   return (
     <section className="perspective-1000 grid w-full grid-cols-3 gap-6 rounded-[2.5rem] border border-white/10 bg-slate-900/40 p-6 shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:p-8">
       {holeIds.map((holeId) => {
-        const isActive = activeHole === holeId;
+        const activeMole = activeMoles.find(m => m.holeId === holeId);
+        const isActive = !!activeMole;
         const isHit = lastHitHole === holeId;
 
         return (
@@ -46,13 +47,17 @@ export function MoleGrid({
                   }`}
                 >
                   {/* Mole Body */}
-                  <div className="h-full w-full rounded-t-full border-b-0 border-x-4 border-t-4 border-amber-900/30 bg-gradient-to-b from-amber-400 via-amber-500 to-amber-700 shadow-[0_-10px_25px_-5px_rgba(245,158,11,0.4)]">
+                  <div className="h-full w-full rounded-t-full border-b-0 border-x-4 border-t-4 border-amber-900/30 bg-gradient-to-b from-amber-400 via-amber-500 to-amber-700 shadow-[0_-10px_25px_-5px_rgba(245,158,11,0.4)] flex flex-col items-center justify-start pt-2">
+                    {/* Value Display */}
+                    <span className="text-2xl font-black text-slate-950 bg-white/40 px-2 rounded-lg backdrop-blur-sm">
+                      {activeMole?.value}
+                    </span>
+                    
                     {/* Eyes */}
-                    <div className="absolute top-1/4 left-1/4 h-2 w-2 rounded-full bg-slate-900 animate-pulse" />
-                    <div className="absolute top-1/4 right-1/4 h-2 w-2 rounded-full bg-slate-900 animate-pulse" />
-                    {/* Blush */}
-                    <div className="absolute top-1/3 left-1/5 h-1.5 w-3 rounded-full bg-rose-400/40 blur-[1px]" />
-                    <div className="absolute top-1/3 right-1/5 h-1.5 w-3 rounded-full bg-rose-400/40 blur-[1px]" />
+                    <div className="mt-2 flex gap-4">
+                      <div className="h-2 w-2 rounded-full bg-slate-900" />
+                      <div className="h-2 w-2 rounded-full bg-slate-900" />
+                    </div>
                   </div>
                 </div>
               </div>
