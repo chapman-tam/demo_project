@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+:root {
+  --font-sans: var(--font-poppins), "Poppins", system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: 
+    radial-gradient(circle at 20% 15%, rgba(124, 58, 237, 0.45), transparent 50%),
+    radial-gradient(circle at 80% 85%, rgba(6, 182, 212, 0.35), transparent 50%),
+    linear-gradient(to bottom, #020617, #0f172a);
+  min-height: 100vh;
+}
+
+@keyframes mole-pop {
+  0% { transform: translateY(110%) scaleY(0.6); }
+  60% { transform: translateY(-5%) scaleY(1.1); }
+  100% { transform: translateY(0) scaleY(1); }
+}
+
+@keyframes mole-hit {
+  0% { transform: scale(1); filter: brightness(1.5); }
+  40% { transform: scale(0.85); filter: brightness(2); }
+  100% { transform: scale(0); filter: brightness(1); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-4px, 2px); }
+  50% { transform: translate(4px, -2px); }
+  75% { transform: translate(-2px, -2px); }
+}
+
+@keyframes float-up {
+  0% { opacity: 0; transform: translateY(0); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-40px); }
+}
+
+.animate-mole-pop {
+  animation: mole-pop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.animate-mole-hit {
+  animation: mole-hit 0.15s ease-out forwards;
+}
+
+.animate-shake {
+  animation: shake 0.2s ease-in-out;
+}
+
+.animate-float-up {
+  animation: float-up 0.6s ease-out forwards;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
