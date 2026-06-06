@@ -14,17 +14,17 @@ export function GameHud({ score, bestScore, timeLeft, question }: GameHudProps) 
   ];
 
   return (
-    <section className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
+    <section className="grid w-full grid-cols-2 gap-2 sm:grid-cols-4">
       {statCards.map((card) => (
         <article
           key={card.label}
-          className="group flex flex-col rounded-2xl border border-white/15 bg-white/5 p-4 shadow-lg backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:border-white/35"
+          className="group flex flex-col rounded-xl border border-white/15 bg-white/5 p-3 shadow-lg backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:border-white/35"
         >
-          <span className="text-sm font-medium uppercase tracking-[0.2em] text-slate-300">
+          <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-slate-300">
             {card.label}
           </span>
           <span
-            className={`mt-2 bg-gradient-to-r ${card.tone} bg-clip-text text-3xl font-bold text-transparent`}
+            className={`mt-1 bg-gradient-to-r ${card.tone} bg-clip-text text-xl font-bold text-transparent`}
           >
             {card.value}
           </span>

@@ -203,12 +203,12 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-6 pb-28 pt-28 sm:px-10">
-        <section className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-slate-900/40 p-8 shadow-2xl backdrop-blur-md">
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 px-6 pb-20 pt-20 sm:px-8">
+        <section className="relative overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-900/40 p-5 shadow-2xl backdrop-blur-md">
            <div className="relative z-10">
-             <h2 className="text-4xl font-black tracking-tight text-white sm:text-5xl">Speed is everything.</h2>
-             <p className="mt-3 max-w-xl text-lg font-medium text-slate-400">
-               Tap moles as they pop. Survive the 30s clock.
+             <h2 className="text-2xl font-black tracking-tight text-white sm:text-3xl">Speed is everything.</h2>
+             <p className="mt-1 max-w-xl text-sm font-medium text-slate-400">
+               Tap moles as they pop. Survive the 45s clock.
              </p>
            </div>
            <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-violet-600/10 blur-[100px]" />
